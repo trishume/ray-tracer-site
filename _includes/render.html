@@ -1,0 +1,7 @@
+{% if renderfile contains ".mp4" %}
+<video autoplay loop muted src="renders/{{ renderfile }}" class="{{ renderclass }}" id="{{ renderid }}">
+    No video :-(
+</video>
+{% else %}
+<img src="renders/{{ renderfile }}" class="{{ renderclass }}" id="{{ renderid }}"/>
+{% endif %}

@@ -1,0 +1,291 @@
+---
+# - Preliminary: `fancy_mesh_plain`, `fancy_mesh_73_nophong`
+#   - Extras shown: phong shading, Disney BRDF
+# - Texture mapping: `fancy_mesh_skybox`, `fancy_mesh_paint`, `fancy_mesh_cube`
+#   - Extras shown: Texture mapping any attribute of BRDF, mapping inside sphere, emission
+# - Normal mapping: `studio_73_2`, `studio_full_2.mp4`, `fancy_mesh_cubenormal`
+# - Path tracing: `cornell_10313_refl`
+# - Soft shadows: `cornell_10313_area`
+#   - Extras shown: lights that are physically in the scene
+# - Glossy reflection: `cornell_12361_gloss_area`, `cornell_10313_gloss_floor`
+# - Anti-aliasing: `fancy_mesh_cube_noaa`, `fancy_mesh_cube`
+# - Depth of field: `dof_6217_fancy`, `dof_6217_nodof`
+# - Animation: `anim_hq`
+#   - Extras shown: rounded hex bar primitive, SDF domain repetition
+# - CSG: `csg_copper_hq`
+# - Final Scene: `final_1097_mc6_4k_dof` `final_1097_mc6_4k`
+#   - Extras shown: portals, non-filtered textures, blender export
+
+# - Mandelbox: `studio_585_bigmandel`
+# - Portals: `cornell_8265_portal`
+# - Tone Mapping: `final_585_notone_sb`
+# - Low discrepancy sampling: `dof_9_plain_02`, `dof_9_plain_uniform`
+- name: Prologue (Extra)
+  extras: Disney BRDF, Phong shading
+  images:
+    - name: Disney BRDF
+      file: fancy_mesh_73_nophong.png
+      desc: Suzanne monkey head model with dielectric 0.5 roughness Disney BRDF material.
+    - name: Phong shading
+      file: fancy_mesh_73_phong.png
+      desc: Same scene rendered with Phong shading enabled.
+  text: |
+    First, for context for the rest of the renders, all my renders use an implementation of a subset of the Disney BRDF (Burley 2012). This is a high quality physically based microfacet BRDF including proper Fresnel and other effects for dielectrics and metals. My implementation has three parameters: albedo, metallness and roughness. I also implemented Phong Shading for my meshes.
+
+    I removed support for materials other than the Disney BRDF, hence why I'm showing it first. Similarly, Phong Shading is only disable-able by compile time switch, or by exporting a model without shared vertices.
+
+    After implementing the Disney BRDF, I rendered a simple scene with both Blender's Cycles renderer and mine and they were a perfect match, which gave me confidence and allowed me to tune materials in Blender.
+- name: Texture Mapping
+  extras: Surface emission
+  images:
+    - name: Sky emission sphere
+      file: fancy_mesh_skybox.png
+      desc: Sky texture mapped onto the inside of a giant sphere.
+    - name: Painted mesh
+      file: fancy_mesh_paint.png
+      desc: Texture painted in Blender matches perfectly.
+    - name: Varying material
+      file: fancy_mesh_cube.png
+      desc: Colour, metallness and roughness textures on a cube.
+  text: |
+    I implemented texture mapping by making my material take all of its attributes from a texture, and then implented the ability to create constant and image texture files from Lua. I added UV coordinates for meshes, cubes and spheres. Textures are filtered with bilinear filtering of the 4 nearest texels.
+
+    This allows mapping base colour, metalness and roughness. I also added special support for emission textures and rendering inside spheres to support environment maps.
+- name: Normal Mapping
+  images:
+    - name: Test normal map
+      file: fancy_mesh_cubenormal.png
+      desc: Shiny plastic cube with normal map
+    - name: Fancy normal map
+      file: studio_73_2.png
+      desc: Textured and normal mapped surfaces
+    - name: Moving highlights
+      file: studio_full_2.mp4
+      desc: Animation showing highlights aren't just textures
+  text: |
+    I implemented normal mapping including the required tangents for meshes, cubes and spheres.
+
+    I verified with the test texture shown on the cube that the normals have the correct orientation.
+- name: Path Tracing
+  images:
+    - name: Cornell box
+      file: cornell_10313_plain.png
+      desc: Cornell box with diffuse objects showing colour bleed
+    - name: Reflective sphere
+      file: cornell_10313_refl.png
+      desc: With a sphere material emulating polished copper
+  text: |
+    I implemented global illumination using Path Tracing. I importance sample both the diffuse and specular lobes of the Disney BRDF.
+
+    My integrator is based on the path formulation of the rendering equation, where the integration is done in the outer loop so that path components can be re-used as they are extended and checked against direct lights at each bounce.
+
+    Mirror reflection was my A4 objective, but it's now implemented an entirely different way as just a very low roughness material, where the importance sampling of the specular node leads to mirror-like results.
+- name: Soft Shadows
+  extras: Lights in scene
+  images:
+    - name: Soft shadows
+      file: cornell_10313_area.png
+      desc: Cornell box with area light
+  text: |
+    I implemented soft shadows by overhauling my lighting model so that lights are just spheres with an emission texture on them, just like environment maps. I then changed the lights array normally passed into the render to just a list of `GeometryNode`s to sample explicitly.
+
+    The path tracing integrator then at each bounce samples the cone of directions subtended by the sphere that would fit in the bounding box of the objects. This means at the moment only spherical area lights work correctly. This is more efficient than sampling a point on the sphere since only visible positions on the light are sampled.
+
+    This also allows me to render the area light as a physical object that exists in the world, or I can put it in the list to be sampled but not the scene for an invisible light.
+- name: Glossy Reflection
+  images:
+    - name: Glossy reflection
+      file: cornell_12361_gloss_area.png
+      desc: Cornell box with rough copper sphere
+    - name: Glossy floor
+      file: cornell_10313_gloss_floor.png
+      desc: Cornell box with shiny dielectric floor
+  text: |
+    Glossy reflection falls out directly from the path tracing integrator and the specular lobe of the Disney BRDF, which uses an empirically based GGX distribution for the microfacet normals. I importance sample the GGX distribution term of the specular lobe so glossy reflection converges quickly.
+
+    With path tracing the only difference between specular highlights and glossy reflection is whether the light was directly sampled!
+- name: Anti-aliasing
+  images:
+    - name: Cube with no AA
+      file: fancy_mesh_cube_noaa.png
+      desc: Textured cube without anti-aliasing
+    - name: Glossy floor
+      file: fancy_mesh_cube.png
+      desc: Textured cube with anti-aliasing
+  text: |
+    Anti-aliasing is implemented as part of the same sampling framework that the path tracing uses. On each sample a random position in a square pixel region is picked to cast the ray for.
+
+    For textures I only do bilinear filtering with 4 texels so for high resolution textures anti-aliasing is also necessary for textured surfaces to look correct.
+- name: Depth of Field
+  images:
+    - name: Cubes with DOF
+      file: dof_6217_fancy.png
+      desc: Focal point is on the red cube
+    - name: Cubes with no DOF
+      file: dof_6217_nodof.png
+      desc: Comparison rendered with zero aprature
+  text: |
+    I implement the thin lens model of depth of field by finding where the original ray intersects the focal plane, then sampling a random point on a disk representing the aperture of the camera and casting a ray from that point to the point on the focal plane.
+- name: Animation
+  extras: Hex bar primitive, SDFs
+  images:
+    - name: Abstract animation
+      file: anim_hq.mp4
+      desc: Perfect loop!
+    - name: First frame
+      file: anim_hq_f-0t.png
+      desc: Uncompressed render
+  text: |
+    I implemented animation in Lua by constructing multiple scenes and rendering them to separate files, then using FFMPEG to stitch them together. The animation is done with math, logic and a cosine-based curve for smoothly easing in and out.
+
+    This scene shows a perfectly looping animation with rose gold and black plastic rounded hexagons on a metal surface.
+
+    This also shows off a bit of the distance field ray marching explained in the next section. In this case I use modulo to do a domain repetition of a rounded hexagonal bar primitive formula with the parameter being the rotation, which is driven from Lua.
+- name: Constructive Solid Geometry
+  extras: Ellipsoid primitive, SDFs
+  images:
+    - name: CSG Shape
+      file: csg_329_mat5.png
+      desc: Cube with spheres and ellipsoids subtracted and intersected
+    - name: CSG Animation
+      file: csg_copper_hq.mp4
+      desc: Showing parameterization and that it's not a mesh
+  text: |
+    I implemented Constructive Solid Geometry (CSG) in a different way than is standard for ray tracers. I implemented a primitive for ray marching a distance field. This is a method of rendering a 3D surface given a function from a point to the distance to a surface by taking steps along a ray based on the function.
+
+    Once that is implemented, CSG is simple to implement by taking the minimum (union) or maximum (intersection) of two distance functions, subtraction is taking the maximum with the negative of a signed distance function.
+
+# The primitive takes a function ID (all the functions are defined in C++) and a parameter for doing animation. The C++ defines a few different shapes using primitives formulas from [Inigo Quilez](http://iquilezles.org/www/articles/distfunctions/distfunctions.htm) along with CSG.
+- name: Mandelbox Primitive (Extra)
+  images:
+    - name: Small Mandelbox
+      file: studio_585_smallmandel.png
+      desc: Wooden floor and small copper Mandelbox
+    - name: Big red Mandelbox
+      file: studio_585_bigredmandel.png
+      desc: Wooden floor and big red Mandelbox
+  text: |
+    Using distance field ray marching it is possible to render Mandelbrot-style iteration fractals by using the running derivative of the iteration as a distance estimate. I implemented the distance function for one such fractal, the Mandelbox.
+
+    I then used CSG to subtract and intersect with some cubes to carve out an interesting region inside the fractal, since the outside isn't too impressive.
+- name: PORTALS! (Extra)
+  images:
+    - name: Portal
+      file: cornell_8265_portal.png
+      desc: Portal from Cornell box to wooden floor scene
+  text: |
+    In order to implement my final scene concept I needed portals, which for my case meant a way to have an object act as a portal where rays passing through it would end up in a different scene, bidirectionally.
+
+    I implemented this by giving all rays and surface hits a world number field. Then I modified my code so all scattering and light sampling would observe the world field and cast follow up and shadow rays with the same world.
+
+    Then I added a portal `SceneNode` subclass that checks the world ID of incoming rays and first tests it against that index of its children, as well as a special portal node pointer, and if it hits the portal before it hits the current world, it spawns a new ray in the next world number modulo its number of children, and does the required changing and remapping ray t values to spawn the new ray at the portal.
+- name: "Final Scene: \"Realism\""
+  vertical: true
+  extras: Non-filtered textures
+  images:
+    - name: "\"Realism\""
+      file: final_1097_mc6_4k_dof.png
+      desc: Final scene
+    - name: Zero Aperture
+      file: final_1097_mc6_4k.png
+      desc: No depth of field to show details
+  text: |
+    My goal was to render a scene that was as photorealistic as possible while having elements that clearly couldn't be real. shows off high quality textures and models (not done by me) in a scene I arranged and tuned the materials for. Uses a portal, a Mandelbox, global illumination, and various hand-tuned Disney BRDF materials.
+- name: Filmic Tone Mapping (Extra)
+  vertical: true
+  images:
+    - name: No mapping
+      file: final_585_notone.png
+      desc: Final scene with no tone mapping
+    - name: False Colour
+      file: final_585_false.png
+      desc: Showing dynamic range
+    - name: Normal Comparison
+      file: final_1097_mc6_4k.png
+      desc: The LUT used for the main render
+    - name: Higher contrast LUT
+      file: final_585_highcontrast.png
+      desc: Final scene rendered with high-contrast LUT used for other renders
+  text: |
+    An important part of the photorealism of my renders is very high quality tone mapping. I implemented a parser for the 1D and 3D OpenColorIO lookup table (LUT) formats, and a function to apply them correctly with linear and trilinear interpolation respectively.
+
+    The good tone mapping allows for scenes with realistic high dynamic range lighting to render properly without getting blown out and with photo-like colour. As you can see from the render with no tone mapping where the colours are bad, the sun on the keyboard is totally blown out, and the shades of black on the display rim are lost.
+
+    I can also use different LUTs for different scenes. I rendered my final scene with a more camera-like LUT with lots of dynamic range, but the rest of my scenes with a higher contrast LUT that gives punchier colours but isn't as photorealistic.
+
+    I can also use a false colour LUT to see what the dynamic range of my scene is like.
+- name: Tone Desaturation (Extra)
+  images:
+    - name: No mapping
+      file: outside_73_notone.png
+      desc: Blowout of a colour light
+    - name: 1D LUT
+      file: outside_73_nodesat.png
+      desc: Tone mapping with just a 1D LUT
+    - name: 3D Desaturation LUT
+      file: outside_73_tone.png
+      desc: With desaturation LUT
+  text: |
+    Part of the tone mapping is a 3D LUT that desaturates very bright colours, simulating bleed between film layers, which can produce a pleasing effect with very bright colours getting desaturated. This effectively allows for more dynamic range to be shown.
+
+    This scene shows includes a ridiculously bright pure pink light to demonstrate.
+- name: Low Discrepancy Sampling (Extra)
+  images:
+    - name: Uniform random
+      file: dof_9_plain_uniform.png
+      desc: 9 samples of DOF with uniform random sampling
+    - name: Low-discrepancy
+      file: dof_9_plain_02.png
+      desc: 9 samples of DOF with (0,2) sequence sampling
+  text: |
+    I implemented sampling using the Sobol (0,2) sequence using a fast gray code technique from the [PBRT book](http://www.pbrt.org/). These samples have better distribution in many dimensions and can be used progressively, leading to faster render convergence rates.
+- name: Blender Export (Extra)
+  vertical: true
+  images:
+    - name: Blender
+      file: blender_1.png
+      desc: Final scene in Blender
+    - name: Previewing
+      file: blender_2.png
+      desc: Using Cycles to preview parts of the scene
+  text: |
+    I put my final scene together in Blender and it took over 15 hours to do, if I had to do it entirely with conversion scripts and lua files it would have been infeasible. So I wrote a script using Blender's Python API that exports all objects in the scene into OBJ files and a lua file that references them all and sets them up with the right materials.
+
+    I can then reference the objects defined in this lua file in my final scene's lua file, while adding arrangements like portals that Blender can't do. It also exports object transforms separately so I can do things like replace a cube with a Mandelbox.
+
+    I used the same set of film emulation LUTs included in Blender so that I could match Cycles almost exactly.
+- name: Progressive Rendering (Extra)
+  images:
+    - name: 1 sample
+      file: cornell_1.png
+      desc: 9 samples image of a Cornell box
+    - name: 9 samples
+      file: cornell_9.png
+      desc: 9 samples image from same run
+    - name: 73 samples
+      file: cornell_73.png
+      desc: 73 samples image from same run
+    - name: 10313 samples
+      file: cornell_10313_area.png
+      desc: 10313 samples image from same run
+  text: |
+    I made my renderer progressive by saving a matrix of Sobol sampler states and running my sampler in epochs of gradually increasing sample count, while keeping the samples for each pixel in each epoch in the innermost loop for cache/branch prediction efficiency. Every epoch it saves an image of its progress so far.
+- name: Multithreading & Bar (Extra)
+  images:
+    - name: Progress bar
+      file: progress_crop.png
+      desc: Console output of a render
+  text: |
+    I made my renderer multithreaded using all available hyperthreads using the C++11 threading library. It distributes rows of image alternately to each thread for evenly distributed difficulty. I implemented a multi-threaded progress bar with proper locking to print nice console progress with ANSI escape codes.
+
+    It scales linearly with number of cores. I rendered most images on this page on a 64 core pre-emptible Google Cloud instance for only $0.50 an hour.
+- name: Misc. Acceleration (Extra)
+  vertical: true
+  text: |
+    I implemented a number of optimizations so that I could render large scenes with path tracing in a reasonable amount of time. I don't have graphs because these are mostly asymptotic or varying by scene so I could make the graphs show whatever I wanted.
+
+    - So that I could render large meshes, I integrated the [FastBVH](https://github.com/brandonpelfrey/Fast-BVH) bounding box hierarchy library into my mesh primitive. This took about 2 hours.
+    - I implemented my own bounding box hierachy checks at the scene node level, although that hierarchy is just the manually constructed hierarchy from Lua.
+    - I baked the hierarchical transform down into each `GeometryNode` and only apply the transform if it is not the identity, to reduce the number of matrix multiplies per ray per object.
+    - When implementing formulas, I follow best practices for floating point performance and avoid or precompute square roots, trig functions and divisions wherever possible using a number of standard tricks.
+    - I use the Moller-Trumbore ray-triangle intersection method which is just an algebraic improvement on the one presented in class, but is much faster.

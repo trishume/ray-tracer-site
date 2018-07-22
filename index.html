@@ -1,0 +1,201 @@
+---
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>Yūbinkyoku 🏣 - Tristan Hume</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="stylesheet" href="vendor/normalize.css">
+  <link rel="stylesheet" href="vendor/skeleton.css">
+
+  <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <!-- <link rel="icon" type="image/png" href="images/favicon.png"> -->
+  <style type="text/css">
+  .render-desc {
+    max-width: 450px;
+    min-height: 100px;
+    flex-grow: 1;
+
+    background-color: #f6f6f6;
+    border-radius: 10px;
+    padding: 10px;
+    padding-right: 15px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .render-desc p {
+    margin-bottom: 0px;
+  }
+
+  .render-desc h5 {
+    margin-bottom: 0px;
+  }
+
+  .render-thumb {
+    max-height: 100px;
+    max-width: 160px;
+    border-radius: 10px;
+  }
+
+  .render-info {
+    margin-left: 10px;
+  }
+
+  .render-active {
+    background-color: #f0f0ff;
+  }
+
+  .section {
+    margin-bottom: 100px;
+  }
+
+  .hide {
+    display: none;
+  }
+
+  .render-descs {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .render-full-box {
+    /*min-height: 800px;*/
+  }
+  </style>
+</head>
+<body>
+
+  <!-- Primary Page Layout
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <div class="container u-max-full-width">
+    <div class="row" style="margin-top: 50px;">
+      <div class="seven columns">
+        <h1>Yūbinkyoku 🏣</h1>
+        <h5><a href="//thume.ca">Tristan Hume</a>'s photorealistic path tracer made for CS488</h5>
+        <p>
+          Made as my final project for UWaterloo's CS488 Graphics class, this is the demo page for my path tracing renderer made with the goal of maximum photorealism. It's named after the Japanese word for "post office" because it made so little sense as the name for a ray tracer that it made me burst out laughing, and there's an emoji for it.
+        </p>
+        <!-- <h2>Features</h2> -->
+      </div>
+    </div>
+    {% for section in site.data.sections %}
+    {% assign sectionid = forloop.index %}
+    <div class="row section">
+      {% if section.vertical and section.images == nil %}
+      <div class="seven columns">
+      {% elsif section.vertical %}
+      <div class="ten columns">
+      {% else %}
+      <div class="four columns">
+      {% endif %}
+        <h3>{{section.name}}</h3>
+        <div>
+          {{ section.text | markdownify }}
+          {% if section.extras %}
+          <p><strong>Extras shown:</strong> {{section.extras}}</p>
+          {% endif %}
+        </div>
+        {% if section.images %}
+        <div class="render-descs">
+        {% for image in section.images %}
+          <div class="render-desc desc-{{ sectionid }} {% if forloop.first %}render-active{% endif %}"
+            id="render-desc-{{ sectionid }}-{{ forloop.index }}"
+            data-file="{{ image.file }}"
+            data-sectionid="{{ sectionid }}"
+            data-renderid="{{ forloop.index }}">
+
+            {% capture renderfile %}{{ image.file }}{% endcapture %}
+            {% capture renderid %}render-thumb-{{ sectionid }}-{{ forloop.index }}{% endcapture %}
+            {% assign renderclass = "render-thumb" %}
+            {% include render.html %}
+
+            <div class="render-info">
+              <h5>{{image.name}}</h5>
+              {{image.desc | markdownify }}
+            </div>
+          </div>
+        {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% if section.images %}
+      {% if section.vertical %}
+      <div>
+      {% else %}
+      <div class="eight columns render-full-box">
+      {% endif %}
+        {% for image in section.images %}
+          {% capture renderfile %}{{ image.file }}{% endcapture %}
+          {% capture renderclass %}
+          u-max-full-width
+          render-full-{{ sectionid }}
+          {% if forloop.first != true %}hide{% endif %}
+          {% endcapture %}
+          {% capture renderid %}render-full-{{ sectionid }}-{{ forloop.index }}{% endcapture %}
+          {% include render.html %}
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+<!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+<script type="text/javascript">
+var renders = document.querySelectorAll(".render-desc");
+
+function selectRender(renderDesc) {
+  // console.log(renderDesc.dataset);
+
+  // Deselect all
+  var sectionRenders = document.querySelectorAll(".desc-"+renderDesc.dataset.sectionid);
+  sectionRenders.forEach(function(other) {
+    other.classList.remove('render-active');
+  });
+  renderDesc.classList.add('render-active');
+
+  // Deselect all
+  var sectionRenders = document.querySelectorAll(".render-full-"+renderDesc.dataset.sectionid);
+  sectionRenders.forEach(function(other) {
+    other.classList.add('hide');
+  });
+  var selectedFullRender = document.getElementById("render-full-"+renderDesc.dataset.sectionid + "-" + renderDesc.dataset.renderid);
+  selectedFullRender.classList.remove('hide');
+
+  // var fullRenderImg = document.getElementById("render-full-"+renderDesc.dataset.sectionid);
+  // fullRenderImg.src = "renders/" + renderDesc.dataset.file;
+}
+
+renders.forEach(function(renderDesc) {
+  renderDesc.addEventListener("mouseenter", function( event ) {
+    selectRender(renderDesc);
+  });
+  renderDesc.addEventListener("touchstart", function( event ) {
+    selectRender(renderDesc);
+  });
+});
+</script>
+</body>
+</html>
