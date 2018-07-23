@@ -92,7 +92,10 @@
         <h1>Yūbinkyoku 🏣</h1>
         <h5><a href="//thume.ca">Tristan Hume</a>'s photorealistic path tracer made for CS488</h5>
         <p>
-          Made as my final project for UWaterloo's CS488 Graphics class, this is the demo page for my path tracing renderer made with the goal of maximum photorealism. It's named after the Japanese word for "post office" because it made so little sense as the name for a ray tracer that it made me burst out laughing, and there's an emoji for it.
+          Made as my final project for UWaterloo's CS488 Graphics class, this is the demo page for my path tracing renderer made with the goal of maximum photorealism. I put about a full time month's worth of work effort into this project, way more than required, since I was having a lot of fun and had a Final Scene in mind I wanted to reach.
+        </p>
+        <p>
+          It's named after the Japanese word for "post office" because it made so little sense as the name for a ray tracer that it made me burst out laughing, and the fact that there's an emoji for it sealed the deal. Why the idea of naming it after the Japanese word for "post office" occurred to me in the first place is a long story.
         </p>
         <!-- <h2>Features</h2> -->
       </div>
@@ -105,7 +108,7 @@
       
         <h3>Prologue (Extra)</h3>
         <div>
-          <p>First, for context for the rest of the renders, all my renders use an implementation of a subset of the Disney BRDF (Burley 2012). This is a high quality physically based microfacet BRDF including proper Fresnel and other effects for dielectrics and metals. My implementation has three parameters: albedo, metallness and roughness. I also implemented Phong Shading for my meshes.</p>
+          <p>First, for context for the rest of the renders, all my renders use an implementation of a subset of the Disney BRDF (Burley 2012). This is a high quality physically based microfacet BRDF including proper Fresnel and other effects for dielectrics and metals. My implementation has three parameters: base colour, metalness and roughness. I also implemented Phong Shading for my meshes.</p>
 
 <p>I removed support for materials other than the Disney BRDF, hence why I’m showing it first. Similarly, Phong Shading is only disable-able by compile time switch, or by exporting a model without shared vertices.</p>
 
@@ -204,6 +207,8 @@
         <h3>Texture Mapping</h3>
         <div>
           <p>I implemented texture mapping by making my material take all of its attributes from a texture, and then implented the ability to create constant and image texture files from Lua. I added UV coordinates for meshes, cubes and spheres. Textures are filtered with bilinear filtering of the 4 nearest texels.</p>
+
+<p>The image texture Lua function has options for applying inverse gamma correction, scaling coordinates and scaling values.</p>
 
 <p>This allows mapping base colour, metalness and roughness. I also added special support for emission textures and rendering inside spheres to support environment maps.</p>
 
@@ -563,7 +568,7 @@
 
 <p>The path tracing integrator then at each bounce samples the cone of directions subtended by the sphere that would fit in the bounding box of the objects. This means at the moment only spherical area lights work correctly. This is more efficient than sampling a point on the sphere since only visible positions on the light are sampled.</p>
 
-<p>This also allows me to render the area light as a physical object that exists in the world, or I can put it in the list to be sampled but not the scene for an invisible light.</p>
+<p>This also allows me to render the area light as a physical object that exists in the world, or I can put it in the list to be sampled but not in the scene for an invisible light.</p>
 
           
           <p><strong>Extras shown:</strong> Lights in scene</p>
@@ -763,7 +768,7 @@
 
 
             <div class="render-info">
-              <h5>Glossy floor</h5>
+              <h5>Cube with AA</h5>
               <p>Textured cube with anti-aliasing</p>
 
             </div>
@@ -855,8 +860,8 @@
 
 
             <div class="render-info">
-              <h5>Cubes with no DOF</h5>
-              <p>Comparison rendered with zero aprature</p>
+              <h5>No DOF</h5>
+              <p>Comparison rendered with zero aperture</p>
 
             </div>
           </div>
@@ -1263,7 +1268,9 @@
       
         <h3>Final Scene: "Realism"</h3>
         <div>
-          <p>My goal was to render a scene that was as photorealistic as possible while having elements that clearly couldn’t be real. shows off high quality textures and models (not done by me) in a scene I arranged and tuned the materials for. Uses a portal, a Mandelbox, global illumination, and various hand-tuned Disney BRDF materials.</p>
+          <p>My goal was to render a scene that was as photorealistic as possible while having whimsical elements that clearly couldn’t be real. The scene shows off high quality textures and models (not done by me) in a scene I arranged and tuned the materials for. I also tried to compose an artistically nice scene that tells a story. Uses a portal, a Mandelbox, global illumination, and various hand-tuned Disney BRDF materials.</p>
+
+<p>While I didn’t make most of the models and textures, I still spent over 15 hours arranging, tuning materials and light, composing the scene, and importing various model formats.</p>
 
           
           <p><strong>Extras shown:</strong> Non-filtered textures</p>
@@ -1648,7 +1655,7 @@
       
         <h3>Low Discrepancy Sampling (Extra)</h3>
         <div>
-          <p>I implemented sampling using the Sobol (0,2) sequence using a fast gray code technique from the <a href="http://www.pbrt.org/">PBRT book</a>. These samples have better distribution in many dimensions and can be used progressively, leading to faster render convergence rates.</p>
+          <p>I implemented sampling using the Sobol (0,2) sequence with a fast gray code technique from the <a href="http://www.pbrt.org/">PBRT book</a>. These samples have better distribution in many dimensions and can be used progressively, leading to faster render convergence rates.</p>
 
           
         </div>

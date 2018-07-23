@@ -30,7 +30,7 @@
       file: fancy_mesh_73_phong.png
       desc: Same scene rendered with Phong shading enabled.
   text: |
-    First, for context for the rest of the renders, all my renders use an implementation of a subset of the Disney BRDF (Burley 2012). This is a high quality physically based microfacet BRDF including proper Fresnel and other effects for dielectrics and metals. My implementation has three parameters: albedo, metallness and roughness. I also implemented Phong Shading for my meshes.
+    First, for context for the rest of the renders, all my renders use an implementation of a subset of the Disney BRDF (Burley 2012). This is a high quality physically based microfacet BRDF including proper Fresnel and other effects for dielectrics and metals. My implementation has three parameters: base colour, metalness and roughness. I also implemented Phong Shading for my meshes.
 
     I removed support for materials other than the Disney BRDF, hence why I'm showing it first. Similarly, Phong Shading is only disable-able by compile time switch, or by exporting a model without shared vertices.
 
@@ -49,6 +49,8 @@
       desc: Colour, metallness and roughness textures on a cube.
   text: |
     I implemented texture mapping by making my material take all of its attributes from a texture, and then implented the ability to create constant and image texture files from Lua. I added UV coordinates for meshes, cubes and spheres. Textures are filtered with bilinear filtering of the 4 nearest texels.
+
+    The image texture Lua function has options for applying inverse gamma correction, scaling coordinates and scaling values.
 
     This allows mapping base colour, metalness and roughness. I also added special support for emission textures and rendering inside spheres to support environment maps.
 - name: Normal Mapping
@@ -91,7 +93,7 @@
 
     The path tracing integrator then at each bounce samples the cone of directions subtended by the sphere that would fit in the bounding box of the objects. This means at the moment only spherical area lights work correctly. This is more efficient than sampling a point on the sphere since only visible positions on the light are sampled.
 
-    This also allows me to render the area light as a physical object that exists in the world, or I can put it in the list to be sampled but not the scene for an invisible light.
+    This also allows me to render the area light as a physical object that exists in the world, or I can put it in the list to be sampled but not in the scene for an invisible light.
 - name: Glossy Reflection
   images:
     - name: Glossy reflection
@@ -109,7 +111,7 @@
     - name: Cube with no AA
       file: fancy_mesh_cube_noaa.png
       desc: Textured cube without anti-aliasing
-    - name: Glossy floor
+    - name: Cube with AA
       file: fancy_mesh_cube.png
       desc: Textured cube with anti-aliasing
   text: |
@@ -121,9 +123,9 @@
     - name: Cubes with DOF
       file: dof_6217_fancy.png
       desc: Focal point is on the red cube
-    - name: Cubes with no DOF
+    - name: No DOF
       file: dof_6217_nodof.png
-      desc: Comparison rendered with zero aprature
+      desc: Comparison rendered with zero aperture
   text: |
     I implement the thin lens model of depth of field by finding where the original ray intersects the focal plane, then sampling a random point on a disk representing the aperture of the camera and casting a ray from that point to the point on the focal plane.
 - name: Animation
@@ -190,7 +192,9 @@
       file: final_1097_mc6_4k.png
       desc: No depth of field to show details
   text: |
-    My goal was to render a scene that was as photorealistic as possible while having elements that clearly couldn't be real. shows off high quality textures and models (not done by me) in a scene I arranged and tuned the materials for. Uses a portal, a Mandelbox, global illumination, and various hand-tuned Disney BRDF materials.
+    My goal was to render a scene that was as photorealistic as possible while having whimsical elements that clearly couldn't be real. The scene shows off high quality textures and models (not done by me) in a scene I arranged and tuned the materials for. I also tried to compose an artistically nice scene that tells a story. Uses a portal, a Mandelbox, global illumination, and various hand-tuned Disney BRDF materials.
+
+    While I didn't make most of the models and textures, I still spent over 15 hours arranging, tuning materials and light, composing the scene, and importing various model formats.
 - name: Filmic Tone Mapping (Extra)
   vertical: true
   images:
@@ -238,7 +242,7 @@
       file: dof_9_plain_02.png
       desc: 9 samples of DOF with (0,2) sequence sampling
   text: |
-    I implemented sampling using the Sobol (0,2) sequence using a fast gray code technique from the [PBRT book](http://www.pbrt.org/). These samples have better distribution in many dimensions and can be used progressively, leading to faster render convergence rates.
+    I implemented sampling using the Sobol (0,2) sequence with a fast gray code technique from the [PBRT book](http://www.pbrt.org/). These samples have better distribution in many dimensions and can be used progressively, leading to faster render convergence rates.
 - name: Blender Export (Extra)
   vertical: true
   images:
