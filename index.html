@@ -153,6 +153,7 @@
           {% capture renderclass %}
           u-max-full-width
           render-full-{{ sectionid }}
+          img-render-full
           {% if forloop.first != true %}hide{% endif %}
           {% endcapture %}
           {% capture renderid %}render-full-{{ sectionid }}-{{ forloop.index }}{% endcapture %}
@@ -167,7 +168,6 @@
 <!-- End Document
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 <script type="text/javascript">
-var renders = document.querySelectorAll(".render-desc");
 
 function selectRender(renderDesc) {
   // console.log(renderDesc.dataset);
@@ -191,6 +191,7 @@ function selectRender(renderDesc) {
   // fullRenderImg.src = "renders/" + renderDesc.dataset.file;
 }
 
+var renders = document.querySelectorAll(".render-desc");
 renders.forEach(function(renderDesc) {
   renderDesc.addEventListener("mouseenter", function( event ) {
     selectRender(renderDesc);
@@ -199,6 +200,17 @@ renders.forEach(function(renderDesc) {
     selectRender(renderDesc);
   });
 });
+</script>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script type="text/javascript" src="vendor/blowup.js"></script>
+<script type="text/javascript">
+  $(document).ready(function () {
+      var renders = document.querySelectorAll(".img-render-full");
+      renders.forEach(function(render) {
+        $(render).blowup({scale: 4});
+      });
+  });
 </script>
 </body>
 </html>
