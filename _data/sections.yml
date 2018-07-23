@@ -43,7 +43,7 @@
       desc: Sky texture mapped onto the inside of a giant sphere.
     - name: Painted mesh
       file: fancy_mesh_paint.png
-      desc: Texture painted in Blender matches perfectly.
+      desc: Texture painted in Blender, also looks glitchy there.
     - name: Varying material
       file: fancy_mesh_cube.png
       desc: Colour, metallness and roughness textures on a cube.
