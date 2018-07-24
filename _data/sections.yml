@@ -194,9 +194,9 @@
     - name: Zero Aperture
       file: final_1097_mc6_4k.png
       desc: No depth of field to show details
-    - name: Early development
-      file: final_early1.png
-      desc: Render from early in development
+    # - name: Early development
+    #   file: final_early1.png
+    #   desc: Render from early in development
   text: |
     My goal was to render a scene that was as photorealistic as possible while having whimsical elements that clearly couldn't be real. The scene shows off high quality textures and models (not done by me) in a scene I arranged and tuned the materials for. I also tried to compose an artistically nice scene that tells a story. Uses a portal, a Mandelbox, global illumination, and various hand-tuned Disney BRDF materials.
 
