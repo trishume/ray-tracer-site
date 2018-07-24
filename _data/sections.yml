@@ -77,7 +77,7 @@
       file: cornell_10313_refl.png
       desc: With a sphere material emulating polished copper
   text: |
-    I implemented global illumination using Path Tracing. I importance sample both the diffuse and specular lobes of the Disney BRDF.
+    I implemented global illumination using path tracing. I importance sample both the diffuse and specular lobes of the Disney BRDF.
 
     My integrator is based on the path formulation of the rendering equation, where the integration is done in the outer loop so that path components can be re-used as they are extended and checked against direct lights at each bounce.
 
@@ -99,6 +99,9 @@
     - name: Glossy reflection
       file: cornell_12361_gloss_area.png
       desc: Cornell box with rough copper sphere
+    # - name: Cycles render
+    #   file: cornell_cycles_denoised.png
+    #   desc: Same scene in Cycles with denoising and less samples
     - name: Glossy floor
       file: cornell_10313_gloss_floor.png
       desc: Cornell box with shiny dielectric floor
@@ -191,6 +194,9 @@
     - name: Zero Aperture
       file: final_1097_mc6_4k.png
       desc: No depth of field to show details
+    - name: Early development
+      file: final_early1.png
+      desc: Render from early in development
   text: |
     My goal was to render a scene that was as photorealistic as possible while having whimsical elements that clearly couldn't be real. The scene shows off high quality textures and models (not done by me) in a scene I arranged and tuned the materials for. I also tried to compose an artistically nice scene that tells a story. Uses a portal, a Mandelbox, global illumination, and various hand-tuned Disney BRDF materials.
 
