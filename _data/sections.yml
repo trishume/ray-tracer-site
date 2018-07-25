@@ -143,7 +143,7 @@
   text: |
     I implemented animation in Lua by constructing multiple scenes and rendering them to separate files, then using FFMPEG to stitch them together. The animation is done with math, logic and a cosine-based curve for smoothly easing in and out.
 
-    This scene shows a perfectly looping animation with rose gold and black plastic rounded hexagons on a metal surface.
+    This scene shows a perfectly looping animation with rose gold and black plastic rounded hexagons on a metal surface. It was *heavily* inspired by [this animation](https://gfycat.com/WideeyedAstonishingDonkey).
 
     This also shows off a bit of the distance field ray marching explained in the next section. In this case I use modulo to do a domain repetition of a rounded hexagonal bar primitive formula with the parameter being the rotation, which is driven from Lua.
 - name: Constructive Solid Geometry
