@@ -268,7 +268,7 @@
   images:
     - name: 1 sample
       file: cornell_1.png
-      desc: 9 samples image of a Cornell box
+      desc: 1 sample image of a Cornell box
     - name: 9 samples
       file: cornell_9.png
       desc: 9 samples image from same run
