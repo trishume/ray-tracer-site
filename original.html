@@ -93,26 +93,16 @@
       <div class="seven columns">
         <h1>Yūbinkyoku 🏣</h1>
         <h5><a href="//thume.ca">Tristan Hume</a>'s photorealistic path tracer made for CS488</h5>
-      </div>
-    </div>
-    <div class="row" style="margin-top: 0px;">
-      <div class="seven columns">
         <p>
-          Made as my <a href="https://www.student.cs.uwaterloo.ca/~cs488/gallery-A5.html">final project for UWaterloo's CS488 Graphics class</a>, this is the demo page for my path tracing renderer made with the goal of maximum photorealism. I put about a full time month's worth of work effort into this project, way more than required, since I was having a lot of fun and had a final scene in mind I wanted to reach.
+          Made as my final project for UWaterloo's CS488 Graphics class, this is the demo page for my path tracing renderer made with the goal of maximum photorealism. I put about a full time month's worth of work effort into this project, way more than required, since I was having a lot of fun and had a Final Scene in mind I wanted to reach.
         </p>
         <p>
           It's named after the Japanese word for "post office" because it made so little sense as the name for a ray tracer that it made me burst out laughing, and the fact that there's an emoji for it sealed the deal. Why the idea of naming it after the Japanese word for "post office" occurred to me in the first place is a long story.
         </p>
-        <p>
-          It's not open source since it uses some code (e.g OBJ file loading) from the course, and there are better open source renderers out there. But if you want more technical details you can read the <a href="report.pdf">project report</a>, although it's written with an intended audience of the course TAs.
-        </p>
         <!-- <h2>Features</h2> -->
       </div>
     </div>
-    <div class="row" style="margin-top: 0px; margin-bottom: 50px;">
-      <img src="renders/final_1097_mc6_4k.png" class="u-max-full-width" alt="My Final Scene"/>
-    </div>
-    {% for section in site.data.sections %}
+    {% for section in site.data.original %}
     {% assign sectionid = forloop.index %}
     <div class="row section">
       {% if section.vertical and section.images == nil %}

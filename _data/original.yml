@@ -20,21 +20,23 @@
 # - Portals: `cornell_8265_portal`
 # - Tone Mapping: `final_585_notone_sb`
 # - Low discrepancy sampling: `dof_9_plain_02`, `dof_9_plain_uniform`
-- name: Prologue
-  # extras: Disney BRDF, Phong shading
+- name: Prologue (Extra)
+  extras: Disney BRDF, Phong shading
   images:
     - name: Disney BRDF
-      file: fancy_mesh_73_phong.png
-      desc: Suzanne monkey head model with dielectric 0.5 roughness Disney BRDF material.
-    - name: No Phong Shading
       file: fancy_mesh_73_nophong.png
-      desc: Same scene rendered with Phong shading disabled.
+      desc: Suzanne monkey head model with dielectric 0.5 roughness Disney BRDF material.
+    - name: Phong shading
+      file: fancy_mesh_73_phong.png
+      desc: Same scene rendered with Phong shading enabled.
   text: |
     First, for context for the rest of the renders, all my renders use an implementation of a subset of the Disney BRDF (Burley 2012). This is a high quality physically based microfacet BRDF including proper Fresnel and other effects for dielectrics and metals. My implementation has three parameters: base colour, metalness and roughness. I also implemented Phong Shading for my meshes.
 
+    I removed support for materials other than the Disney BRDF, hence why I'm showing it first. Similarly, Phong Shading is only disable-able by compile time switch, or by exporting a model without shared vertices.
+
     After implementing the Disney BRDF, I rendered a simple scene with both Blender's Cycles renderer and mine and they were a perfect match, which gave me confidence and allowed me to tune materials in Blender.
 - name: Texture Mapping
-  # extras: Surface emission
+  extras: Surface emission
   images:
     - name: Sky emission sphere
       file: fancy_mesh_skybox.png
@@ -48,18 +50,20 @@
   text: |
     I implemented texture mapping by making my material take all of its attributes from a texture, and then implented the ability to create constant and image texture files from Lua. I added UV coordinates for meshes, cubes and spheres. Textures are filtered with bilinear filtering of the 4 nearest texels.
 
+    The image texture Lua function has options for applying inverse gamma correction, scaling coordinates and scaling values.
+
     This allows mapping base colour, metalness and roughness. I also added special support for emission textures and rendering inside spheres to support environment maps.
 - name: Normal Mapping
   images:
-    - name: Moving highlights
-      file: studio_full_2.mp4
-      desc: Animation showing moving normal mapped highlights
     - name: Test normal map
       file: fancy_mesh_cubenormal.png
       desc: Shiny plastic cube with normal map
     - name: Fancy normal map
       file: studio_73_2.png
       desc: Textured and normal mapped surfaces
+    - name: Moving highlights
+      file: studio_full_2.mp4
+      desc: Animation showing highlights aren't just textures
   text: |
     I implemented normal mapping including the required tangents for meshes, cubes and spheres.
 
@@ -76,8 +80,10 @@
     I implemented global illumination using path tracing. I importance sample both the diffuse and specular lobes of the Disney BRDF.
 
     My integrator is based on the path formulation of the rendering equation, where the integration is done in the outer loop so that path components can be re-used as they are extended and checked against direct lights at each bounce.
+
+    Mirror reflection was my A4 objective, but it's now implemented an entirely different way as just a very low roughness material, where the importance sampling of the specular node leads to mirror-like results.
 - name: Soft Shadows
-  # extras: Lights in scene
+  extras: Lights in scene
   images:
     - name: Soft shadows
       file: cornell_10313_area.png
@@ -126,7 +132,7 @@
   text: |
     I implement the thin lens model of depth of field by finding where the original ray intersects the focal plane, then sampling a random point on a disk representing the aperture of the camera and casting a ray from that point to the point on the focal plane.
 - name: Animation
-  # extras: Hex bar primitive, SDFs
+  extras: Hex bar primitive, SDFs
   images:
     - name: Abstract animation
       file: anim_hq.mp4
@@ -141,7 +147,7 @@
 
     This also shows off a bit of the distance field ray marching explained in the next section. In this case I use modulo to do a domain repetition of a rounded hexagonal bar primitive formula with the parameter being the rotation, which is driven from Lua.
 - name: Constructive Solid Geometry
-  # extras: Ellipsoid primitive, SDFs
+  extras: Ellipsoid primitive, SDFs
   images:
     - name: CSG Shape
       file: csg_329_mat5.png
@@ -155,7 +161,7 @@
     Once that is implemented, CSG is simple to implement by taking the minimum (union) or maximum (intersection) of two distance functions, subtraction is taking the maximum with the negative of a signed distance function.
 
 # The primitive takes a function ID (all the functions are defined in C++) and a parameter for doing animation. The C++ defines a few different shapes using primitives formulas from [Inigo Quilez](http://iquilezles.org/www/articles/distfunctions/distfunctions.htm) along with CSG.
-- name: Mandelbox Primitive
+- name: Mandelbox Primitive (Extra)
   images:
     - name: Small Mandelbox
       file: studio_585_smallmandel.png
@@ -167,7 +173,7 @@
     Using distance field ray marching it is possible to render Mandelbrot-style iteration fractals by using the running derivative of the iteration as a distance estimate. I implemented the distance function for one such fractal, the Mandelbox.
 
     I then used CSG to subtract and intersect with some cubes to carve out an interesting region inside the fractal, since the outside isn't too impressive.
-- name: PORTALS!
+- name: PORTALS! (Extra)
   images:
     - name: Portal
       file: cornell_8265_portal.png
@@ -182,12 +188,12 @@
   vertical: true
   extras: Non-filtered textures
   images:
-    - name: Final Scene
-      file: final_1097_mc6_4k.png
-      desc: My best scene
-    - name: With depth of field
+    - name: "\"Realism\""
       file: final_1097_mc6_4k_dof.png
-      desc: With artistic DOF
+      desc: Final scene
+    - name: Zero Aperture
+      file: final_1097_mc6_4k.png
+      desc: No depth of field to show details
     # - name: Early development
     #   file: final_early1.png
     #   desc: Render from early in development
@@ -195,7 +201,7 @@
     My goal was to render a scene that was as photorealistic as possible while having whimsical elements that clearly couldn't be real. The scene shows off high quality textures and models (not done by me) in a scene I arranged and tuned the materials for. I also tried to compose an artistically nice scene that tells a story. Uses a portal, a Mandelbox, global illumination, and various hand-tuned Disney BRDF materials.
 
     While I didn't make most of the models and textures, I still spent over 15 hours arranging, tuning materials and light, composing the scene, and importing various model formats.
-- name: Filmic Tone Mapping
+- name: Filmic Tone Mapping (Extra)
   vertical: true
   images:
     - name: No mapping
@@ -218,7 +224,7 @@
     I can also use different LUTs for different scenes. I rendered my final scene with a more camera-like LUT with lots of dynamic range, but the rest of my scenes with a higher contrast LUT that gives punchier colours but isn't as photorealistic.
 
     I can also use a false colour LUT to see what the dynamic range of my scene is like.
-- name: Tone Desaturation
+- name: Tone Desaturation (Extra)
   images:
     - name: No mapping
       file: outside_73_notone.png
@@ -233,7 +239,7 @@
     Part of the tone mapping is a 3D LUT that desaturates very bright colours, simulating bleed between film layers, which can produce a pleasing effect with very bright colours getting desaturated. This effectively allows for more dynamic range to be shown.
 
     This scene shows includes a ridiculously bright pure pink light to demonstrate.
-- name: Low Discrepancy Sampling
+- name: Low Discrepancy Sampling (Extra)
   images:
     - name: Uniform random
       file: dof_9_plain_uniform.png
@@ -243,7 +249,7 @@
       desc: 9 samples of DOF with (0,2) sequence sampling
   text: |
     I implemented sampling using the Sobol (0,2) sequence with a fast gray code technique from the [PBRT book](http://www.pbrt.org/). These samples have better distribution in many dimensions and can be used progressively, leading to faster render convergence rates.
-- name: Blender Export
+- name: Blender Export (Extra)
   vertical: true
   images:
     - name: Blender
@@ -258,7 +264,7 @@
     I can then reference the objects defined in this lua file in my final scene's lua file, while adding arrangements like portals that Blender can't do. It also exports object transforms separately so I can do things like replace a cube with a Mandelbox.
 
     I used the same set of film emulation LUTs included in Blender so that I could match Cycles almost exactly.
-- name: Progressive Rendering
+- name: Progressive Rendering (Extra)
   images:
     - name: 1 sample
       file: cornell_1.png
@@ -274,7 +280,7 @@
       desc: 10313 samples image from same run
   text: |
     I made my renderer progressive by saving a matrix of Sobol sampler states and running my sampler in epochs of gradually increasing sample count, while keeping the samples for each pixel in each epoch in the innermost loop for cache/branch prediction efficiency. Every epoch it saves an image of its progress so far.
-- name: Multithreading & Bar
+- name: Multithreading & Bar (Extra)
   images:
     - name: Progress bar
       file: progress_crop.png
@@ -283,7 +289,7 @@
     I made my renderer multithreaded using all available hyperthreads using the C++11 threading library. It distributes rows of image alternately to each thread for evenly distributed difficulty. I implemented a multi-threaded progress bar with proper locking to print nice console progress with ANSI escape codes.
 
     It scales linearly with number of cores. I rendered most images on this page on a 64 core pre-emptible Google Cloud instance for only $0.50 an hour.
-- name: Misc. Acceleration
+- name: Misc. Acceleration (Extra)
   vertical: true
   text: |
     I implemented a number of optimizations so that I could render large scenes with path tracing in a reasonable amount of time. I don't have graphs because these are mostly asymptotic or varying by scene so I could make the graphs show whatever I wanted.
@@ -293,12 +299,3 @@
     - I baked the hierarchical transform down into each `GeometryNode` and only apply the transform if it is not the identity, to reduce the number of matrix multiplies per ray per object.
     - When implementing formulas, I follow best practices for floating point performance and avoid or precompute square roots, trig functions and divisions wherever possible using a number of standard tricks.
     - I use the Moller-Trumbore ray-triangle intersection method which is just an algebraic improvement on the one presented in class, but is much faster.
-- name: Other Credits
-  vertical: true
-  text: |
-    - I learned a lot of what I know from sitting down and reading the [PBRT book](https://www.pbrt.org/), many parts of my ray tracer are based on reading the theory and rationale for doing something a certain way in my paper copy of the book while reading it start to finish, and then coding up my own version later. Things built following the methods from PBRT include my path tracing, importance sampling, area light sampling, depth of field and my low-discrepancy sequence generation.
-    - The primitive signed distance function equations I use for modeling including the box, sphere, ellipsoid and hex bar all come from [Inigo Quilez's SDF modeling page](http://iquilezles.org/www/articles/distfunctions/distfunctions.htm).
-    - My Mandelbox distance estimator is based on code from [a blog post](http://blog.hvidtfeldts.net/index.php/2011/11/distance-estimated-3d-fractals-vi-the-mandelbox/) by Mikael Hvidtfeldt Christensen explaining the theory behind the distance estimator. It is nigh-impossible to implement a Mandelbox estimator without referencing code since the way it is designed is based on aesthetics and approximations that don't always have a perfect theoretical basis.
-    - All the models and textures in all my scenes except the Mandelbox pedestal and desk were downloaded from the internet, although I re-did the materials myself using the Disney BRDF. The Minecraft hill was sculpted by me in Minecraft and then exported using the jmc2obj tool. Links: [Macbook model](https://www.modelplusmodel.com/tech/electronics/apple-macbook-pro-15.html), [stapler model](https://www.blendswap.com/blends/view/73501), [book model](https://pbrt.org/scenes-v3.html), [CGBookCase](https://www.cgbookcase.com/), [CC0Textures](https://cc0textures.com/), [3DTextures](https://3dtextures.me/), [TextureHaven](https://texturehaven.com/), [HDRIHaven](https://hdrihaven.com/).
-    - The Lego in my final scene was based on [a model](https://www.mecabricks.com/en/models/nKZvmlQbjG6) found on the [Mecabricks Lego CAD site](https://www.mecabricks.com/), simplified a bit by me, and then exported.
-    - The Film emulation LUTs I load in for tone mapping come from [Troy Sobotka's Filmic Blender addon](https://github.com/sobotka/filmic-blender), which was later incorporated directly into Blender. I also had an email conversation with Troy where he clarified some of my understanding of how the different colour spaces fit together.
